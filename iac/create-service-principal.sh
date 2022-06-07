@@ -10,6 +10,7 @@ subscription="af2174da-9280-40ab-93b7-c5bab2b3c6e5"
 read -d '' appId clientSecret tenantID <<< $(az ad sp create-for-rbac \
   --role $roleName \
   --scope "/subscriptions/$subscriptionID" \
+  --display-name "helm_study_sp" \
   --query '[appId, password, tenant]' \
   -o tsv)
 
