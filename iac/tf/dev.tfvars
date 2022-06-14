@@ -1,1 +1,4 @@
-env_name="dev"
+tags = {
+  ManagedBy   = "Terraform"
+  Environment = "dev"
+}

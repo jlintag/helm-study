@@ -1,11 +1,5 @@
 # Configure the Azure provider
 terraform {
-  backend "azurerm" {
-    resource_group_name  = "helm_study_rg"
-    storage_account_name = "helmstudysa"
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -24,28 +18,13 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "helm_study_rg" {
-  name     = "helm_study_rg"
-  location = "eastus"
-  tags = {
-    ManagedBy   = "Terraform"
-    Environment = var.env_name
-  }
-}
-
-resource "azurerm_storage_account" "helm_study_sa" {
-  name                     = "helmstudysa"
-  resource_group_name      = azurerm_resource_group.helm_study_rg.name
-  location                 = azurerm_resource_group.helm_study_rg.location
-  account_kind             = "BlobStorage"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-
-  tags = var.tags
-}
-
-resource "azurerm_storage_container" "tfstate" {
-  name                  = "tfstate"
-  storage_account_name  = azurerm_storage_account.helm_study_sa.name
-  container_access_type = "blob"
+ # You cannot create a new backend by simply defining this and then
+ # immediately proceeding to "terraform apply". The S3 backend must
+ # be bootstrapped according to the simple yet essential procedure in
+ # https://github.com/cloudposse/terraform-aws-tfstate-backend#usage
+module "state_backend" {
+  source                             = "./modules/backend"
+  env_name                           = local.env_name
+  terraform_backend_config_file_path = "."
+  terraform_backend_config_file_name = "${local.env_name}.backend.tf"
 }
